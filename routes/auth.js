@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { protect } = require('../middleware/auth');
 
 // Token generate karne ka helper
 const generateToken = (id) => {
@@ -59,15 +60,26 @@ router.post('/login', async (req, res) => {
 });
 
 // @route GET /api/auth/profile
-router.get('/profile', async (req, res) => {
+router.get('/profile', protect, (req, res) => {
+  res.json(req.user);
+});
+
+// @route PUT /api/auth/profile
+router.put('/profile', protect, async (req, res) => {
   try {
-    const jwt = require('jsonwebtoken');
-    const token = req.headers.authorization?.split(' ')[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id).select('-password');
+    // Sirf yeh fields badal sakte hain. role, email, password nahi.
+    const allowed = ['name', 'phone', 'businessName', 'businessType', 'businessAddress',
+                     'skills', 'experience', 'availability', 'bio'];
+    const updates = {};
+    allowed.forEach((f) => {
+      if (req.body[f] !== undefined) updates[f] = req.body[f];
+    });
+
+    const user = await User.findByIdAndUpdate(req.user._id, updates, { new: true })
+      .select('-password');
     res.json(user);
   } catch (error) {
-    res.status(401).json({ message: 'Not authorized' });
+    res.status(500).json({ message: error.message });
   }
 });
 
