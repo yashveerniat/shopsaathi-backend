@@ -1,5 +1,8 @@
 # ShopSaathi Backend
 
+- **Live API:** https://shopsaathi-backend.onrender.com
+- **Live app:** https://shopsaathi-e778c.web.app
+
 REST API for **ShopSaathi**, a hyperlocal job-matching platform that connects small Indian shop owners (kirana, medical, stationery stores) with nearby workers.
 
 Frontend (React + Firebase): https://github.com/yashveerniat/shopsaathi
